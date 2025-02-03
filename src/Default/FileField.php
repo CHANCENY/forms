@@ -6,8 +6,9 @@ use Simp\Fields\FieldBase;
 use Simp\Fields\FieldRequiredException;
 use Simp\Fields\FieldTypeSupportException;
 
-class SelectField extends FieldBase
+class FileField extends FieldBase
 {
+
     private array $field;
     private array $submission;
     private string $validation_message;
@@ -17,15 +18,16 @@ class SelectField extends FieldBase
 
         $this->validation_message = '';
 
-        $supported_field_type = ['select'];
+        $supported_field_type = ['file'];
 
         if (!in_array($field['type'], $supported_field_type)) {
-            throw new FieldTypeSupportException("Field type '{$field['type']}' is not supported with this class ".SelectField::class);
+            throw new FieldTypeSupportException("Field type '{$field['type']}' is not supported with this class ".FileField::class);
         }
 
-        $required = ['label', 'name', 'type', 'option_values'];
+        $required = ['label', 'name', 'type'];
 
         foreach ($required as $field_key) {
+
             if (!isset($field[$field_key])) {
                 throw new FieldRequiredException("Field key {$field_key} is required");
             }
@@ -39,20 +41,13 @@ class SelectField extends FieldBase
                 $field_name = substr($field_name, 0, -2);
             }
 
-            $value = $post[$field_name] ?? null;
+            $value = $files[$field_name] ?? null;
             if (!is_null($value)) {
                 $this->submission['value'] = $value;
             }
         }
 
-        if ($request_method === 'GET') {
-            $value = $params[$field['name']] ?? null;
-            if (!is_null($value)) {
-                $this->submission['value'] = $value;
-            }
-        }
     }
-
     public function getLabel(): string
     {
         return $this->field['label'] ?? '';
@@ -70,7 +65,7 @@ class SelectField extends FieldBase
 
     public function getId(): string
     {
-        return $this->field['id'] ?? '';
+       return $this->field['id'] ?? '';
     }
 
     public function getClassList(): array
@@ -90,84 +85,97 @@ class SelectField extends FieldBase
 
     public function getDefaultValue(): string|int|float|null|array|bool
     {
-        return $this->field['default_value'] ?? '';
+       return !empty($this->field['value']) ? $this->field['value'] : $this->submission['value'] ?? null;
     }
 
     public function getValue(): string|int|float|null|array|bool
     {
-        return !empty($this->submission['value']) ? $this->submission['value'] : $this->getDefaultValue();
+        return $this->submission['value'] ?? null;
+    }
+
+    private function formatSize(int $size): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        $factor = 1024;
+        $i = 0;
+
+        while ($size >= $factor && $i < count($units) - 1) {
+            $size /= $factor;
+            $i++;
+        }
+
+        return round($size, 2) . ' ' . $units[$i];
     }
 
     public function getBuildField(bool $wrapper = true): string
     {
-        $options = $this->field['option_values'] ?? [];
-        $value = $this->getValue();
-        $option_html = [];
-        foreach ($options as $key=>$option) {
+        $values = $this->getValue();
+        $index = array_search('multiple', $this->getOptions());
 
-            $added = false;
-            if (is_array($value)) {
-                foreach ($value as $item) {
+        $default_values = [];
+        if ($index !== false && $this->getOptions()[$index] === 'multiple' && !empty($values['name']) && is_array($values['name'])) {
 
-                    if ($item === $key) {
-                        $option_html[] = "<option value='{$key}' selected>{$option}</option>";
-                        $added = true;
-                    }
-                }
-            }
-            elseif (  is_string($value)) {
-                if ($value === $key) {
-                    $option_html[] = "<option value='{$key}' selected>{$option}</option>";
-                    $added = true;
-                }
-            }
-
-            if ($added === false) {
-                $option_html[] = "<option value='{$key}'>{$option}</option>";
+            for ($i = 0; $i < count($values['name']); $i++) {
+                $default_values[] = [
+                    'name' => $values['name'][$i],
+                    'size' => $this->formatSize($values['size'][$i]),
+                    'type' => $values['type'][$i],
+                ];
             }
         }
+        elseif(!empty($values['name'])) {
+            $default_values[] = [
+                'name' => $values['name'],
+                'size' => $this->formatSize($values['size']),
+                'type' => $values['type'],
+            ];
+        }
 
-        $option_html = implode('\n', $option_html);
         $class = implode(' ', $this->getClassList());
-        $options = implode('', $this->getOptions());
-
-        $class_name = trim($this->getName(), ']');
+        $options = implode(' ', $this->getOptions());
+        $class_name = trim($this->getName(),']');
         $class_name = trim($class_name, '[');
 
-        if ($wrapper === true) {
-            return <<<FIELD_HTML
-<div class="field-wrapper field--{$class_name} js-form-field-{$class_name}">
-    <label for="{$this->getId()}">{$this->getLabel()}</label>
-    <select name="{$class_name}" 
-    id="{$this->getId()}"
-    class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"
-     {$options}>
-    >
-    <option value="">Select...</option>
-    {$option_html}
-</select>
-     <span class="field-description">{$this->getDescription()}</span>
-     <span class="field-message message-{$class_name}">{$this->validation_message}</span>
+        $uploaded_files = null;
+        foreach ($default_values as $default_value) {
+            $uploaded_files .= <<<UPLOAD
+<div class="file-wrapper-upload">
+  <div>
+  <strong>File: </strong>
+  <span>{$default_value['name']} &nbsp;&nbsp;</span>
+  <span>{$default_value['size']} &nbsp;&nbsp;</span>
+  <span>{$default_value['type']}</span>
+  </div>
 </div>
-FIELD_HTML;
+UPLOAD;
         }
 
-        return <<<FIELD_HTML
- <label for="{$this->getId()}">{$this->getLabel()}
-  <select name="{$this->getName()}" 
-    id="{$this->getId()}"
+        if ($wrapper) {
+            return <<<FIELD
+<div class="field-wrapper field--{$class_name} js-form-field-{$class_name}">
+    <label for="{$this->getId()}">{$this->getLabel()}</label>
+    <input type="{$this->getType()}" 
+    name="{$this->getName()}" 
+    id="{$this->getId()}" 
     class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"
-     {$options}>
-    >
-    <option value="">Select...</option>
-    {$option_html}
-</select>
+      {$options}/>
      <span class="field-description">{$this->getDescription()}</span>
      <span class="field-message message-{$class_name}">{$this->validation_message}</span>
- </label>
-FIELD_HTML;
-
-
+     {$uploaded_files}
+</div>
+FIELD;
+        }
+        return <<<FIELD
+<label for="{$this->getId()}">{$this->getLabel()}
+ <input type="{$this->getType()}" 
+    name="{$this->getName()}" 
+    id="{$this->getId()}" 
+    class="{$class} js-form-field-{$this->getName()} field-field--{$this->getName()} js-form-field-{$this->getName()}"
+      {$options}/>
+     <span class="field-description">{$this->getDescription()}</span>
+     <span class="field-message message-{$this->getName()}">{$this->validation_message}</span>
+</label>
+FIELD;
     }
 
     public function setError(string $error): void

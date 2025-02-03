@@ -13,6 +13,10 @@ class Example extends FormBase
 
     public function buildForm(array &$form): array
     {
+        // You can modify form settings from here.
+        $this->setFormAction('index1.php');
+
+        // Define fields.
         $form[] = [
             'name' => 'first_name',
             'label' => 'First Name',
@@ -22,54 +26,15 @@ class Example extends FormBase
                 'form-control',
                 'form-control-sm',
             ],
-            'default_value' => 'John',
+            'default_value' => '',
             'options' => [
                 'placeholder' => 'Enter your first name',
             ],
             'required' => true,
         ];
+
         $form[] = [
-            'name' => 'last_name',
-            'label' => 'Last Name',
-            'type' => 'text',
-            'id' => 'last_name',
-            'class' => [
-                'form-control',
-                'form-control-sm',
-            ],
-            'default_value' => 'John',
-            'options' => [
-                'placeholder' => 'Enter your Last name',
-            ]
-        ];
-        $form[] = [
-            'name' => 'age',
-            'label' => 'Age',
-            'type' => 'number',
-            'id' => 'age',
-            'class' => [
-                'form-control',
-                'form-control-sm',
-            ],
-            'options' => [
-                'placeholder' => 'Enter your age',
-                'max' => 50,
-                'min' => 10,
-            ]
-        ];
-        $form[] = [
-            'name' => 'birthday',
-            'label' => 'Birthday',
-            'type' => 'date',
-            'id' => 'birthday',
-            'class' => [
-                'form-control',
-                'form-control-sm',
-            ],
-            'default_value' => '2010-01-01',
-        ];
-        $form[] = [
-            'name' => 'gender[]',
+            'name' => 'gender',
             'label' => 'Gender',
             'type' => 'select',
             'id' => 'gender',
@@ -81,31 +46,27 @@ class Example extends FormBase
             'option_values' => [
                 'male' => 'Male',
                 'female' => 'Female',
-                'transgender' => 'Transgender',
-                'other' => 'Others',
+                'other' => 'Other',
             ],
-            'description' => 'Select your gender',
-            'required' => true,
-            'options' => [
-                'multiple' => 'multiple',
-            ],
-            'handler' => \Simp\Default\SelectField::class
+            'handler' => \Simp\Default\SelectField::class,
         ];
+
         $form[] = [
-            'name' => 'height',
-            'label' => 'Height',
-            'type' => 'range',
-            'id' => 'height',
-            'options' => [
-                'min' => 1,
-                'max' => 10,
-            ],
-            'default_value' => '6',
+            'name' => 'profile_image[]',
+            'label' => 'Profile Image',
+            'type' => 'file',
+            'id' => 'profile_image',
             'class' => [
                 'form-control',
                 'form-control-sm',
             ],
-            'description' => 'Height is in feet'
+            'default_value' => null,
+            'options' => [
+                'accept' => 'image/*',
+                'multiple' => 'multiple',
+            ],
+            'handler' => \Simp\Default\FileField::class,
+            'required' => true,
         ];
 
         $form[] = [
@@ -116,6 +77,7 @@ class Example extends FormBase
             'default_value' => 'Submit',
             'label' => '',
         ];
+
         return $form;
     }
 
@@ -131,6 +93,6 @@ class Example extends FormBase
 
     public function submitForm(array &$form): void
     {
-        dump($form);
+        print_r($form);
     }
 }
