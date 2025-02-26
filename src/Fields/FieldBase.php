@@ -8,4 +8,16 @@ abstract class FieldBase implements FieldInterface
     {
     }
 
+    protected function findInnerFieldValue(string $field_name, $values) {
+        foreach ($values as $key=>$value) {
+
+            if (is_array($value)) {
+                return $this->findInnerFieldValue($field_name,$value);
+            }
+            elseif ($key === $field_name) {
+                return $value;
+            }
+        }
+        return null;
+    }
 }

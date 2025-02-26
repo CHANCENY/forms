@@ -92,10 +92,19 @@ class SelectField extends FieldBase
     {
         return $this->field['default_value'] ?? '';
     }
+    public function getField(): array
+    {
+        return $this->field;
+    }
 
     public function getValue(): string|int|float|null|array|bool
     {
         return !empty($this->submission['value']) ? $this->submission['value'] : $this->getDefaultValue();
+    }
+
+    public function get(string $field_name)
+    {
+        return $this->getValue();
     }
 
     public function getBuildField(bool $wrapper = true): string

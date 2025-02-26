@@ -62,6 +62,8 @@ interface FieldInterface {
      */
     public function getValue(): string|int|float|null|array|bool;
 
+    public function get(string $field_name);
+
     /**
      * Get field rendered html.
      * @param bool $wrapper
@@ -74,4 +76,5 @@ interface FieldInterface {
     public function getDescription(): string;
 
     public function __toString(): string;
+    public function getField(): array;
 }

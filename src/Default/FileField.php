@@ -93,6 +93,11 @@ class FileField extends FieldBase
         return $this->submission['value'] ?? null;
     }
 
+    public function get(string $field_name)
+    {
+        return $this->getValue();
+    }
+
     private function formatSize(int $size): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
@@ -191,5 +196,9 @@ FIELD;
     public function __toString(): string
     {
         return $this->getBuildField();
+    }
+    public function getField(): array
+    {
+        return $this->field;
     }
 }
