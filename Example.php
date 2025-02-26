@@ -217,6 +217,16 @@ class Example extends FormBase
             ]
         ];
 
+        $form['description_field'] = [
+            'label' => 'what would you like us to know about you?',
+            'type' => 'textarea',
+            'name' => 'description',
+            'id' => 'description',
+            'class' => ['form-control'],
+            'required' => true,
+            'handler' => \Simp\Default\TextAreaField::class,
+        ];
+
         $form[] = [
             'type' => 'submit',
             'name' => 'submit',
