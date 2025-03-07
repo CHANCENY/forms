@@ -4,6 +4,8 @@ namespace Simp\Fields;
 
 abstract class FieldBase implements FieldInterface
 {
+    protected string $validation_message;
+    
     public function __construct(array $field, string $request_method, array $post = [], array $params = [], array $files = [])
     {
     }
@@ -19,5 +21,10 @@ abstract class FieldBase implements FieldInterface
             }
         }
         return null;
+    }
+
+    public function getError(): string
+    {
+        return !empty($this->validation_message) ? $this->validation_message : '';
     }
 }

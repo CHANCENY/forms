@@ -72,6 +72,8 @@ interface FieldInterface {
     public function getBuildField(bool $wrapper = true): string;
 
     public function setError(string $error): void;
+    
+    public function getError(): string;
 
     public function getDescription(): string;
 

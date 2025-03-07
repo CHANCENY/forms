@@ -10,7 +10,7 @@ class BasicField extends FieldBase {
 
     private array $field;
     private array $submission;
-    private string $validation_message;
+    protected string $validation_message;
 
     public function __construct(array $field, string $request_method, array $post = [], array $params = [], array $files = [])
     {
