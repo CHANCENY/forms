@@ -155,12 +155,17 @@ class FileField extends FieldBase
 UPLOAD;
         }
 
+        $name = $this->getName();
+        if (in_array('multiple', $this->getOptions())) {
+            $name .= '[]';
+        }
+
         if ($wrapper) {
             return <<<FIELD
 <div class="field-wrapper field--{$class_name} js-form-field-{$class_name}">
     <label for="{$this->getId()}">{$this->getLabel()}</label>
     <input type="{$this->getType()}" 
-    name="{$this->getName()}" 
+    name="{$name}" 
     id="{$this->getId()}" 
     class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"
       {$options}/>
