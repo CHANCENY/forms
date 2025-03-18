@@ -118,14 +118,14 @@ class SelectField extends FieldBase
             if (is_array($value)) {
                 foreach ($value as $item) {
 
-                    if ($item === $key) {
+                    if ((string) $item === (string) $key) {
                         $option_html[] = "<option value='{$key}' selected>{$option}</option>";
                         $added = true;
                     }
                 }
             }
-            elseif (  is_string($value)) {
-                if ($value === $key) {
+            else {
+                if ((string) $value === (string) $key) {
                     $option_html[] = "<option value='{$key}' selected>{$option}</option>";
                     $added = true;
                 }
