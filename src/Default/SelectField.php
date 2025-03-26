@@ -11,6 +11,7 @@ class SelectField extends FieldBase
     private array $field;
     private array $submission;
     protected string $validation_message;
+
     public function __construct(array $field, string $request_method, array $post = [], array $params = [], array $files = [])
     {
         parent::__construct($field, $request_method, $post, $params, $files);
@@ -143,6 +144,10 @@ class SelectField extends FieldBase
         $class_name = trim($this->getName(), ']');
         $class_name = trim($class_name, '[');
 
+        if (in_array('multiple', $this->getOptions() ?? [])) {
+         $class_name .= '[]';
+        }
+
         if ($wrapper === true) {
             return <<<FIELD_HTML
 <div class="field-wrapper field--{$class_name} js-form-field-{$class_name}">
@@ -151,7 +156,6 @@ class SelectField extends FieldBase
     id="{$this->getId()}"
     class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"
      {$options}>
-    >
     <option value="">Select...</option>
     {$option_html}
 </select>
@@ -194,3 +198,4 @@ FIELD_HTML;
         return $this->getBuildField();
     }
 }
+
