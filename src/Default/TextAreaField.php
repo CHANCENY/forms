@@ -40,6 +40,16 @@ class TextAreaField extends FieldBase
             $value = $post[$field['name']] ?? null;
 
             if ($value !== null) {
+                if (!empty($this->field['sanitize'])) {
+                    if (is_array($value)) {
+                        foreach ($value as $k=>$sub_value) {
+                            $value[$k] = htmlspecialchars(strip_tags($sub_value));
+                        }
+                    }
+                    else {
+                        $value = htmlspecialchars(strip_tags($value));
+                    }
+                }
                 $this->submission['value'] = $value;
             }
 
@@ -49,6 +59,16 @@ class TextAreaField extends FieldBase
 
             $value = $params[$field['name']] ?? null;
             if ($value !== null) {
+                if (!empty($this->field['sanitize'])) {
+                    if (is_array($value)) {
+                        foreach ($value as $k=>$sub_value) {
+                            $value[$k] = htmlspecialchars(strip_tags($sub_value));
+                        }
+                    }
+                    else {
+                        $value = htmlspecialchars(strip_tags($value));
+                    }
+                }
                 $this->submission['value'] = $value;
             }
         }

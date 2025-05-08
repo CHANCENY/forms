@@ -42,14 +42,66 @@ class SelectField extends FieldBase
 
             $value = $post[$field_name] ?? null;
             if (!is_null($value)) {
-                $this->submission['value'] = $value;
+                if (!empty($this->field['sanitize'])) {
+                    if (is_array($value)) {
+                        foreach ($value as $k=>$sub_value) {
+                            $value[$k] = htmlspecialchars(strip_tags($sub_value));
+                        }
+                    }
+                    else {
+                        $value = htmlspecialchars(strip_tags($value));
+                    }
+                }
+
+                if (!empty($this->field['option_values'])) {
+                    if (is_array($value)) {
+                        foreach ($value as $k=>$sub_value) {
+                            if (in_array($sub_value, $this->field['option_values'])) {
+                                $value[$k] = htmlspecialchars(strip_tags($sub_value));
+                            }
+                            else {
+                                $this->validation_message = "you have selected value which is not a valid option";
+                            }
+                        }
+                    }
+                    elseif (!in_array($value, array_keys($this->field['option_values']))) {
+                        $this->validation_message = "you have selected value which is not a valid option";
+                    }
+                    $this->submission['value'] = $value;
+                }
             }
         }
 
         if ($request_method === 'GET') {
             $value = $params[$field['name']] ?? null;
             if (!is_null($value)) {
-                $this->submission['value'] = $value;
+
+                if (!empty($this->field['sanitize'])) {
+                    if (is_array($value)) {
+                        foreach ($value as $k=>$sub_value) {
+                            $value[$k] = htmlspecialchars(strip_tags($sub_value));
+                        }
+                    }
+                    else {
+                        $value = htmlspecialchars(strip_tags($value));
+                    }
+                }
+                if (!empty($this->field['option_values'])) {
+                    if (is_array($value)) {
+                        foreach ($value as $k=>$sub_value) {
+                            if (in_array($sub_value, array_keys($this->field['option_values']))) {
+                                $value[$k] = htmlspecialchars(strip_tags($sub_value));
+                            }
+                            else {
+                                $this->validation_message = "you have selected value which is not a valid option";
+                            }
+                        }
+                    }
+                    elseif (!in_array($value, array_keys($this->field['option_values']))) {
+                        $this->validation_message = "you have selected value which is not a valid option";
+                    }
+                    $this->submission['value'] = $value;
+                }
             }
         }
     }

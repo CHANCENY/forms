@@ -224,6 +224,7 @@ class Example extends FormBase
             'id' => 'description',
             'class' => ['form-control'],
             'required' => true,
+            'sanitize' => true,
             'handler' => \Simp\Default\TextAreaField::class,
         ];
 
@@ -245,6 +246,6 @@ class Example extends FormBase
 
     public function submitForm(array &$form): void
     {
-
+        //dump($form);
     }
 }

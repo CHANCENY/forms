@@ -114,51 +114,11 @@ class FileField extends FieldBase
 
     public function getBuildField(bool $wrapper = true): string
     {
-        $values = $this->getValue();
-        $index = array_search('multiple', $this->getOptions());
-
-        $default_values = [];
-        if ($index !== false && $this->getOptions()[$index] === 'multiple' && !empty($values['name']) && is_array($values['name'])) {
-
-            for ($i = 0; $i < count($values['name']); $i++) {
-                $default_values[] = [
-                    'name' => $values['name'][$i],
-                    'size' => $this->formatSize($values['size'][$i]),
-                    'type' => $values['type'][$i],
-                ];
-            }
-        }
-        elseif(!empty($values['name'])) {
-            $default_values[] = [
-                'name' => $values['name'],
-                'size' => $this->formatSize($values['size']),
-                'type' => $values['type'],
-            ];
-        }
-
         $class = implode(' ', $this->getClassList());
         $options = implode(' ', $this->getOptions());
         $class_name = trim($this->getName(),']');
         $class_name = trim($class_name, '[');
-
-        $uploaded_files = null;
-        foreach ($default_values as $default_value) {
-            $uploaded_files .= <<<UPLOAD
-<div class="file-wrapper-upload">
-  <div>
-  <strong>File: </strong>
-  <span>{$default_value['name']} &nbsp;&nbsp;</span>
-  <span>{$default_value['size']} &nbsp;&nbsp;</span>
-  <span>{$default_value['type']}</span>
-  </div>
-</div>
-UPLOAD;
-        }
-
         $name = $this->getName();
-        if (in_array('multiple', $this->getOptions())) {
-            $name .= '[]';
-        }
 
         if ($wrapper) {
             return <<<FIELD
@@ -171,7 +131,6 @@ UPLOAD;
       {$options}/>
      <span class="field-description">{$this->getDescription()}</span>
      <span class="field-message message-{$class_name}">{$this->validation_message}</span>
-     {$uploaded_files}
 </div>
 FIELD;
         }
