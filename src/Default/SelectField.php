@@ -163,48 +163,35 @@ class SelectField extends FieldBase
     public function getBuildField(bool $wrapper = true): string
     {
         $options = $this->field['option_values'] ?? [];
-        $value = $this->getValue();
+        $values = $this->getValue();
+        $values = is_array($values) ? $values : [$values];
         $option_html = [];
         foreach ($options as $key=>$option) {
-
-            $added = false;
-            if (is_array($value)) {
-                foreach ($value as $item) {
-
-                    if ((string) $item === (string) $key) {
-                        $option_html[] = "<option value='{$key}' selected>{$option}</option>";
-                        $added = true;
-                    }
-                }
+            if (in_array($option, $values)) {
+                $option_html[] = '<option value="' . $option . '" selected>' . $option . '</option>';
             }
             else {
-                if ((string) $value === (string) $key) {
-                    $option_html[] = "<option value='{$key}' selected>{$option}</option>";
-                    $added = true;
-                }
-            }
-
-            if ($added === false) {
-                $option_html[] = "<option value='{$key}'>{$option}</option>";
+                $option_html[] = '<option value="' . $option . '">' . $option . '</option>';
             }
         }
 
         $option_html = implode('\n', $option_html);
         $class = implode(' ', $this->getClassList());
-        $options = implode('', $this->getOptions());
 
-        $class_name = trim($this->getName(), ']');
-        $class_name = trim($class_name, '[');
-
-        if (in_array('multiple', $this->getOptions() ?? [])) {
-         $class_name .= '[]';
+        $name = $this->getName();
+        $class_name = $this->getName();
+        if (!empty($this->field['limit']) && $this->field['limit'] > 1) {
+            $name = $name . '[]';
+            $this->field['options'][] = 'multiple';
         }
+
+        $options = implode('', $this->getOptions());
 
         if ($wrapper === true) {
             return <<<FIELD_HTML
 <div class="field-wrapper field--{$class_name} js-form-field-{$class_name}">
     <label for="{$this->getId()}">{$this->getLabel()}</label>
-    <select name="{$class_name}" 
+    <select name="{$name}" 
     id="{$this->getId()}"
     class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"
      {$options}>
@@ -216,23 +203,7 @@ class SelectField extends FieldBase
 </div>
 FIELD_HTML;
         }
-
-        return <<<FIELD_HTML
- <label for="{$this->getId()}">{$this->getLabel()}
-  <select name="{$this->getName()}" 
-    id="{$this->getId()}"
-    class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"
-     {$options}>
-    >
-    <option value="">Select...</option>
-    {$option_html}
-</select>
-     <span class="field-description">{$this->getDescription()}</span>
-     <span class="field-message message-{$class_name}">{$this->validation_message}</span>
- </label>
-FIELD_HTML;
-
-
+        
     }
 
     public function setError(string $error): void
