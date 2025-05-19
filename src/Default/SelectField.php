@@ -168,10 +168,10 @@ class SelectField extends FieldBase
         $option_html = [];
         foreach ($options as $key=>$option) {
             if (in_array($option, $values)) {
-                $option_html[] = '<option value="' . $option . '" selected>' . $option . '</option>';
+                $option_html[] = '<option value="' . $key . '" selected>' . $option . '</option>';
             }
             else {
-                $option_html[] = '<option value="' . $option . '">' . $option . '</option>';
+                $option_html[] = '<option value="' . $key . '">' . $option . '</option>';
             }
         }
 
