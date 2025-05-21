@@ -119,6 +119,10 @@ class FileField extends FieldBase
         $class_name = trim($this->getName(),']');
         $class_name = trim($class_name, '[');
         $name = $this->getName();
+        
+        if (!empty($this->field['limit']) && $this->field['limit'] > 1) {
+            $name = $name . '[]';
+        }
 
         if ($wrapper) {
             return <<<FIELD

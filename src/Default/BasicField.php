@@ -161,13 +161,18 @@ class BasicField extends FieldBase {
         foreach ($this->getOptions() as $key=>$option) {
             $options .= $key . '="' . $option . '" ';
         }
+        
+        $name = $this->getName();
+        if (!empty($this->field['limit']) && $this->field['limit'] > 1) {
+           $name .= "[]"; 
+        }
 
         if ($wrapper) {
             return <<<FIELD
 <div class="field-wrapper field--{$this->getName()} js-form-field-{$this->getName()}">
     <label for="{$this->getId()}">{$this->getLabel()}</label>
     <input type="{$this->getType()}" 
-    name="{$this->getName()}" 
+    name="{$name}" 
     id="{$this->getId()}" 
     class="{$class} js-form-field-{$this->getName()} field-field--{$this->getName()} js-form-field-{$this->getName()}"
      value="{$this->getValue()}" {$options}/>
@@ -180,7 +185,7 @@ FIELD;
         return <<<FIELD
 <label for="{$this->getId()}">{$this->getLabel()}
  <input type="{$this->getType()}" 
-    name="{$this->getName()}" 
+    name="{$name}" 
     id="{$this->getId()}" 
     class="{$class} js-form-field-{$this->getName()} field-field--{$this->getName()} js-form-field-{$this->getName()}"
      value="{$this->getValue()}" {$options}/>

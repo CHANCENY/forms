@@ -143,7 +143,7 @@ class CheckboxField extends FieldBase
         foreach ($this->getOptions() as $key=>$option) {
             $options .= $key . '="' . $option . '" ';
         }
-
+        
         $radios = [];
         $values = $this->getValue();
         $values = is_array($values) ? $values : [$values];
