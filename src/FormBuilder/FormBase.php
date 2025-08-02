@@ -5,6 +5,10 @@ namespace Simp\FormBuilder;
 
 abstract class FormBase implements FormInterface {
 
+    protected mixed $options;
+
+    protected array $form_fields = [];
+    
     private array $form_settings = [
         'method' => 'post',
         'action' => '',
@@ -21,6 +25,12 @@ abstract class FormBase implements FormInterface {
         ],
         'js_library' => []
     ];
+
+    public function __construct(mixed $options = [])
+    {
+        $this->options = $options;
+    }
+
     public function setFormMethod(string $method): void
     {
         $this->form_settings['method'] = $method;
@@ -108,5 +118,19 @@ abstract class FormBase implements FormInterface {
     public function setIsJsAllowed(bool $is_js_allow): void
     {
         $this->form_settings['is_js_allow'] = $is_js_allow;
+    }
+
+    public function buildForm(array $form): array
+    {
+        return $form;
+    }
+
+    public function setFormFields(array $form_fields): void
+    {
+        $this->form_fields = $form_fields;
+    }
+
+    public function getFormFields(): array {
+        return $this->form_fields;
     }
 }

@@ -20,8 +20,8 @@ class FormBuilder
         $params = $_GET;
         $method = $_SERVER['REQUEST_METHOD'];
 
-        $form = [];
-        $form = $formBase->buildForm($form);
+        $form = $formBase->buildForm($formBase->getFormFields());
+        
         foreach ($form as $key=>$field) {
             $handler = $field['handler'] ?? BasicField::class;
             $object = new $handler($field, $method, $post, $params, $files);
