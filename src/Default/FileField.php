@@ -2,6 +2,8 @@
 
 namespace Simp\Default;
 
+use Simp\Core\modules\files\entity\File;
+use Simp\Core\modules\files\helpers\FileFunction;
 use Simp\Fields\FieldBase;
 use Simp\Fields\FieldRequiredException;
 use Simp\Fields\FieldTypeSupportException;
@@ -45,6 +47,11 @@ class FileField extends FieldBase
             if (!is_null($value)) {
                 $this->submission['value'] = $value;
             }
+
+            $hidden_name = "field-". $this->field['name']. "_hidden";
+            if (isset($_POST[$hidden_name])) {
+                $this->submission['value'] = $_POST[$hidden_name];
+            }
         }
 
     }
@@ -65,7 +72,7 @@ class FileField extends FieldBase
 
     public function getId(): string
     {
-       return $this->field['id'] ?? '';
+       return !empty($this->field['id']) ? $this->field['id'] : 'field-'.$this->getName();
     }
 
     public function getClassList(): array
@@ -85,7 +92,8 @@ class FileField extends FieldBase
 
     public function getDefaultValue(): string|int|float|null|array|bool
     {
-       return !empty($this->field['value']) ? $this->field['value'] : $this->submission['value'] ?? null;
+       return !empty($this->field['value']) ? $this->field['value'] : $this->submission['value'] ??
+           $this->field['default_value'] ?? null;
     }
 
     public function getValue(): string|int|float|null|array|bool
@@ -119,36 +127,77 @@ class FileField extends FieldBase
         $class_name = trim($this->getName(),']');
         $class_name = trim($class_name, '[');
         $name = $this->getName();
-        
+        $multiple = null;
+
+        $defaults = $this->getDefaultValue();
+        if (!empty($defaults)) {
+            $defaults = array_map(function ($value) {
+                $file = File::load($value)?->toArray() ?? null;
+                if ($file) {
+                    $file['uri'] = FileFunction::reserve_uri($file['uri']);
+                }
+                return $file;
+            },$defaults);
+        }
+        $defaults = json_encode($defaults,JSON_PRETTY_PRINT);
+
         if (!empty($this->field['limit']) && $this->field['limit'] > 1) {
             $name = $name . '[]';
+            $multiple = 'multiple';
         }
 
-        if ($wrapper) {
-            return <<<FIELD
-<div class="field-wrapper field--{$class_name} js-form-field-{$class_name}">
-    <label for="{$this->getId()}">{$this->getLabel()}</label>
+        $wrapper_id = uniqid("file-field-wrapper");
+
+        $styles = <<<STYLES
+<style>
+  .spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+    margin-left: 5px;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .$wrapper_id { margin: 5px 0; }
+</style>
+STYLES;
+
+        $field_html = <<<FIELD
+<div class="field-wrapper field--{$class_name} js-form-field-{$class_name}" id="{$wrapper_id}">
+ <label for="{$this->getId()}">{$this->getLabel()}</label>
     <input type="{$this->getType()}" 
     name="{$name}" 
     id="{$this->getId()}" 
+    {$multiple}
     class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"
       {$options}/>
+      <input type="hidden" id="{$this->getId()}-hidden" name="{$this->getId()}_hidden" value="[]">
+       <div class="preview"></div>
      <span class="field-description">{$this->getDescription()}</span>
      <span class="field-message message-{$class_name}">{$this->validation_message}</span>
+     <noscript style="display: none;">{$defaults}</noscript>
 </div>
 FIELD;
-        }
-        return <<<FIELD
-<label for="{$this->getId()}">{$this->getLabel()}
- <input type="{$this->getType()}" 
-    name="{$this->getName()}" 
-    id="{$this->getId()}" 
-    class="{$class} js-form-field-{$this->getName()} field-field--{$this->getName()} js-form-field-{$this->getName()}"
-      {$options}/>
-     <span class="field-description">{$this->getDescription()}</span>
-     <span class="field-message message-{$this->getName()}">{$this->validation_message}</span>
-</label>
-FIELD;
+
+        $script = file_get_contents(__DIR__. "/../../assets/upload.js");
+
+        $script_html = <<<SCRIPT
+       <script>
+       (function() {
+           
+               const fileFieldWrapper = document.querySelector('#{$wrapper_id}'); 
+               {$script}
+       })();
+       </script>
+SCRIPT;
+
+        return $field_html . $script_html . $styles;
     }
 
     public function setError(string $error): void
