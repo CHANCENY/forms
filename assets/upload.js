@@ -3,6 +3,7 @@ const fileInput = fileFieldWrapper.querySelector('input[type="file"]');
 const preview = fileFieldWrapper.querySelector('.preview');
 const hiddenInput = fileFieldWrapper.querySelector('input[type="hidden"]');
 const noscript = fileFieldWrapper.querySelector('noscript');
+const fieldSettings = fileFieldWrapper.querySelector('.settings');
 
 let uploadedFiles = [];
 
@@ -104,6 +105,7 @@ fileInput.addEventListener("change", async (e) => {
     for (let file of files) {
         formData.append(fileInput.name, file);
     }
+    formData.append('field_settings', fieldSettings.textContent);
 
     try {
         const response = await fetch("/core/upload.php", { method: "POST", body: formData });
@@ -111,7 +113,6 @@ fileInput.addEventListener("change", async (e) => {
 
         results.forEach((fileObj, idx) => {
             const entry = entries[idx];
-            console.log(fileObj, idx);
             if (fileObj.fid) {
                 uploadedFiles.push(fileObj);
                 updateHiddenField();
@@ -121,7 +122,6 @@ fileInput.addEventListener("change", async (e) => {
                 entry.textContent = fileObj.error || "Upload failed";
             }
         });
-
     } catch (err) {
         entries.forEach(entry => { entry.textContent = "Upload failed"; });
     }

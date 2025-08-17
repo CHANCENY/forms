@@ -52,6 +52,12 @@ class FileField extends FieldBase
             if (isset($_POST[$hidden_name])) {
                 $this->submission['value'] = $_POST[$hidden_name];
             }
+            else {
+                $hidden_name = $this->field['name']. "_hidden";
+                if (isset($_POST[$hidden_name])) {
+                    $this->submission['value'] = $_POST[$hidden_name];
+                }
+            }
         }
 
     }
@@ -130,16 +136,10 @@ class FileField extends FieldBase
         $multiple = null;
 
         $defaults = $this->getDefaultValue();
-        if (!empty($defaults)) {
-            $defaults = array_map(function ($value) {
-                $file = File::load($value)?->toArray() ?? null;
-                if ($file) {
-                    $file['uri'] = FileFunction::reserve_uri($file['uri']);
-                }
-                return $file;
-            },$defaults);
-        }
         $defaults = json_encode($defaults,JSON_PRETTY_PRINT);
+        $settings = $this->field;
+        unset($settings['handler']);
+        $settings = json_encode($settings,JSON_PRETTY_PRINT);
 
         if (!empty($this->field['limit']) && $this->field['limit'] > 1) {
             $name = $name . '[]';
@@ -182,6 +182,7 @@ STYLES;
      <span class="field-description">{$this->getDescription()}</span>
      <span class="field-message message-{$class_name}">{$this->validation_message}</span>
      <noscript style="display: none;">{$defaults}</noscript>
+     <script type="application/json" class="settings" style="display: none;">{$settings}</script>
 </div>
 FIELD;
 
