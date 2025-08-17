@@ -111,19 +111,26 @@ fileInput.addEventListener("change", async (e) => {
         const response = await fetch("/core/upload.php", { method: "POST", body: formData });
         const results = await response.json();
 
-        results.forEach((fileObj, idx) => {
-            const entry = entries[idx];
-            if (fileObj.fid) {
-                uploadedFiles.push(fileObj);
-                updateHiddenField();
-                entry.remove();
-                renderFile(fileObj);
-            } else {
-                entry.textContent = fileObj.error || "Upload failed";
-            }
-        });
+        if (results.hasOwnProperty('error')) {
+            entries.forEach(entry => { entry.textContent = results.error; });
+        }
+        else {
+            results.forEach((fileObj, idx) => {
+                const entry = entries[idx];
+                if (fileObj.fid) {
+                    uploadedFiles.push(fileObj);
+                    updateHiddenField();
+                    entry.remove();
+                    renderFile(fileObj);
+                } else {
+                    entry.textContent = fileObj.error || "Upload failed";
+                }
+            });
+        }
+
+
     } catch (err) {
-        entries.forEach(entry => { entry.textContent = "Upload failed"; });
+        entries.forEach(entry => { entry.textContent = "Upload failed 1"; });
     }
 
     fileInput.value = "";
