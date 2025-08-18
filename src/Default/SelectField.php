@@ -167,7 +167,7 @@ class SelectField extends FieldBase
         $values = is_array($values) ? $values : [$values];
         $option_html = [];
         foreach ($options as $key=>$option) {
-            if (in_array($option, $values)) {
+            if (in_array($key, $values)) {
                 $option_html[] = '<option value="' . $key . '" selected>' . $option . '</option>';
             }
             else {
