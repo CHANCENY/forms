@@ -152,6 +152,10 @@ class SelectField extends FieldBase
 
     public function getValue(): string|int|float|null|array|bool
     {
+        if (isset($this->submission['value']) && is_numeric($this->submission['value'])) {
+            return (int)$this->submission['value'];
+        }
+
         return !empty($this->submission['value']) ? $this->submission['value'] : $this->getDefaultValue();
     }
 
