@@ -152,4 +152,13 @@ JS;
         return $this->fields;
     }
 
+    public function __toOnlyFieldString()
+    {
+        $form = '';
+        foreach ($this->fields as $field) {
+            $form .= $field;
+        }
+        return $form;
+    }
+
 }

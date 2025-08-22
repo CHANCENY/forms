@@ -2,7 +2,7 @@
 
 namespace Simp\Fields;
 
-abstract class FieldBase implements FieldInterface
+abstract class FieldBase implements FieldInterface, DisplayHandlerInterface
 {
     protected string $validation_message;
     
@@ -26,5 +26,10 @@ abstract class FieldBase implements FieldInterface
     public function getError(): string
     {
         return !empty($this->validation_message) ? $this->validation_message : '';
+    }
+
+    public function display(string $field_type, FieldBase $field, array $context): string
+    {
+        return "";
     }
 }
