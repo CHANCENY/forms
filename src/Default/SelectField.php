@@ -56,7 +56,7 @@ class SelectField extends FieldBase
                 if (!empty($this->field['option_values'])) {
                     if (is_array($value)) {
                         foreach ($value as $k=>$sub_value) {
-                            if (in_array($sub_value, $this->field['option_values'])) {
+                            if (in_array($sub_value, array_keys($this->field['option_values']))) {
                                 $value[$k] = htmlspecialchars(strip_tags($sub_value));
                             }
                             else {
