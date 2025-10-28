@@ -133,15 +133,24 @@ class TextAreaField extends FieldBase
             $name .= "[]";
         }
 
+        $label = '';
+        if (!empty($this->getLabel())) {
+            $label = "<label for=\"{$this->getId()}\">{$this->getLabel()}</label>";
+        }
+
+        $value = $this->getValue();
+        if (is_array($value)) {
+            $value = $value[0] ?? '';
+        }
         if ($wrapper) {
             return <<<FIELD
 <div class="field-wrapper field--{$this->getName()} js-form-field-{$this->getName()}">
-    <label for="{$this->getId()}">{$this->getLabel()}</label>
+   {$label}
     <{$this->getType()}
     name="{$name}" 
     id="{$this->getId()}" 
     class="{$class} js-form-field-{$this->getName()} field-field--{$this->getName()} js-form-field-{$this->getName()}"
-      {$options}/>{$this->getValue()}</{$this->getType()}>
+      {$options}/>{$value}</{$this->getType()}>
      <span class="field-description">{$this->getDescription()}</span>
      <span class="field-message message-{$this->getName()}">{$this->validation_message}</span>
 </div>

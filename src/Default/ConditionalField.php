@@ -216,6 +216,11 @@ class ConditionalField extends FieldBase
 CONDITIONAL_SCRIPT;
         }
 
+        $label = '';
+        if (!empty($this->getLabel())) {
+            $label = "<legend>{$this->getLabel()}</legend>";
+        }
+
         if ($wrapper) {
             return <<<FIELD
 <div class="field-wrapper field--{$this->getName()} js-form-field-{$this->getName()}">
@@ -223,7 +228,7 @@ CONDITIONAL_SCRIPT;
        class="{$class} js-form-field-{$this->getName()} field-field--{$this->getName()} js-form-field-{$this->getName()}"
        {$options}
        >
-        <legend>{$this->getLabel()}</legend>
+        {$label}
          {$fields_html}
       </fieldset>
       <span class="field-description">{$this->getDescription()}</span>

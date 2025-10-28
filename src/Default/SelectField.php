@@ -191,10 +191,15 @@ class SelectField extends FieldBase
 
         $options = implode('', $this->getOptions());
 
+        $label = '';
+        if (!empty($this->getLabel())) {
+            $label = "<label for=\"{$this->getId()}\">{$this->getLabel()}</label>";
+        }
+
         if ($wrapper === true) {
             return <<<FIELD_HTML
 <div class="field-wrapper field--{$class_name} js-form-field-{$class_name}">
-    <label for="{$this->getId()}">{$this->getLabel()}</label>
+    {$label}
     <select name="{$name}" 
     id="{$this->getId()}"
     class="{$class} js-form-field-{$class_name} field-field--{$class_name} js-form-field-{$class_name}"

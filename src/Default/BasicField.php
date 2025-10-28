@@ -167,10 +167,15 @@ class BasicField extends FieldBase {
            $name .= "[]"; 
         }
 
+        $label = '';
+        if (!empty($this->getLabel())) {
+            $label = "<label for=\"{$this->getId()}\">{$this->getLabel()}</label>";
+        }
+
         if ($wrapper) {
             return <<<FIELD
 <div class="field-wrapper field--{$this->getName()} js-form-field-{$this->getName()}">
-    <label for="{$this->getId()}">{$this->getLabel()}</label>
+    {$label}
     <input type="{$this->getType()}" 
     name="{$name}" 
     id="{$this->getId()}" 

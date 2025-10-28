@@ -173,10 +173,15 @@ class CheckboxField extends FieldBase
 
         }
 
+        $label = '';
+        if (!empty($this->getLabel())) {
+            $label = "<label for=\"{$this->getId()}\">{$this->getLabel()}</label>";
+        }
+
         $line = implode('', $radios);
         return <<<FIELD
 <div class="field-wrapper field--{$this->getName()} js-form-field-{$this->getName()}">
-    <label for="{$this->getId()}">{$this->getLabel()}</label>
+   {$label}
      {$line}
      <span class="field-description">{$this->getDescription()}</span>
      <span class="field-message message-{$this->getName()}">{$this->validation_message}</span>

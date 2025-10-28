@@ -58,6 +58,7 @@ class FileField extends FieldBase
                     $this->submission['value'] = $_POST[$hidden_name];
                 }
             }
+
         }
 
     }
@@ -98,8 +99,7 @@ class FileField extends FieldBase
 
     public function getDefaultValue(): string|int|float|null|array|bool
     {
-       return !empty($this->field['value']) ? $this->field['value'] : $this->submission['value'] ??
-           $this->field['default_value'] ?? null;
+       return $this->field['default_value'] ?? null;
     }
 
     public function getValue(): string|int|float|null|array|bool
@@ -148,6 +148,11 @@ class FileField extends FieldBase
 
         $wrapper_id = uniqid("file-field-wrapper");
 
+        $label = '';
+        if (!empty($this->getLabel())) {
+            $label = "<label for=\"{$this->getId()}\">{$this->getLabel()}</label>";
+        }
+
         $styles = <<<STYLES
 <style>
   .spinner {
@@ -170,7 +175,7 @@ STYLES;
 
         $field_html = <<<FIELD
 <div class="field-wrapper field--{$class_name} js-form-field-{$class_name}" id="{$wrapper_id}">
- <label for="{$this->getId()}">{$this->getLabel()}</label>
+ {$label}
     <input type="{$this->getType()}" 
     name="{$name}" 
     id="{$this->getId()}" 
